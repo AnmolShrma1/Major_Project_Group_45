@@ -1,161 +1,222 @@
-Machine Learning Techniques for Detecting GPS Spoofing Attacks in Mission-Critical Military IoT Devices
-Major Project – B.Tech (CSE)
+# AGIMS — Adaptive GNSS Integrity Monitoring System
+### Machine Learning Based GPS Spoofing Detection for Mission-Critical IoT Systems
+
+**B.Tech Major Project – Computer Science & Engineering**  
+**Jaypee University of Information Technology, Waknaghat**  
+**December 2025**
+
+---
+
+# Overview
+
+AGIMS (Adaptive GNSS Integrity Monitoring System) is a machine-learning-driven framework designed to detect **GPS/GNSS spoofing attacks in real-time** for mission-critical IoT environments.
+
+GPS spoofing is a severe cyber-physical threat capable of disrupting **navigation, timing, and control systems** used in military and autonomous infrastructure.  
+This project integrates **machine learning, signal analysis, and cybersecurity monitoring** to provide a **lightweight real-time spoofing detection system**.
+
+The system analyzes **GNSS signal parameters** and detects anomalies indicating spoofing or signal manipulation.
+
+---
+
+# Key Features
+
+• Real-time GPS spoofing detection  
+• Multi-model machine learning detection pipeline  
+• Deep learning (LSTM) based temporal anomaly detection  
+• GNSS signal feature analysis (CN₀, Doppler, PRN behaviour)  
+• Live spoofing attack simulation dashboard  
+• WebSocket-based real-time monitoring interface  
+• PRN-wise anomaly tracking  
+• Secure logging and signal integrity monitoring  
+• Designed for **mission-critical IoT environments**
+
+---
+
+# System Architecture
+
+The system consists of four major components:
+
+GNSS Signal Logs
+↓
+Feature Extraction & Preprocessing
+↓
+Machine Learning / Deep Learning Detection
+↓
+Real-Time Monitoring Dashboard (AGIMS App)
+
+
+### 1. Data Acquisition
+
+GNSS receiver logs containing satellite signal parameters are collected under different conditions:
+
+• Normal operation  
+• Signal interference / jamming  
+• SDR-based spoofing attacks  
+
+Supported constellations include:
+
+- GPS
+- Galileo
+- GLONASS
+- BeiDou
+- QZSS
+
+---
+
+### 2. Feature Extraction
+
+The system analyzes multiple GNSS signal features:
+
+| Feature | Description |
+|------|------|
+| PRN | Satellite identifier |
+| DO | Doppler offset |
+| PD | Pseudorange deviation |
+| RX | Receiver timestamp |
+| TOW | Time of week |
+| CP | Carrier phase |
+| PC | Pseudorange correction |
+| PIP | Signal integrity parameter |
+| TCD | Timing correction difference |
+| CN0 | Carrier-to-Noise ratio |
+
+Temporal derivatives are also generated to capture **signal instability patterns**.
+
+---
+
+### 3. Machine Learning Models
+
+Multiple ML models were trained and evaluated for spoofing detection:
+
+| Model | Accuracy | Strength |
+|------|------|------|
+| **LightGBM** | 97.7% | Fastest inference |
+| **XGBoost** | 93.6% | Strong generalization |
+| **Random Forest** | 90.5% | Stable baseline |
+| **Linear SVC** | 72.2% | Linear benchmark |
+
+---
+
+### 4. Deep Learning Model (AGIMS)
+
+The final detection pipeline uses an **LSTM-based temporal model** which analyzes sequences of GNSS signals.
+
+Advantages:
+
+• Captures temporal signal drift  
+• Detects gradual spoofing attacks  
+• Handles sequential satellite behavior  
+• Suitable for real-time streaming environments
+
+---
+
+# Real-Time Monitoring Application
+
+The project includes a **browser-based monitoring dashboard** built using:
+
+- **FastAPI (Backend)**
+- **WebSockets**
+- **HTML / CSS / JavaScript**
+
+The dashboard provides:
+
+• Live GNSS signal simulation  
+• Real-time spoofing detection alerts  
+• Signal integrity visualization  
+• Attack severity classification  
+• PRN-level monitoring
+
+---
+
+# Repository Structure
+
+```
+Major_Project_Group_45
+│
+├── AGIMS
+│   ├── train.py
+│   ├── model.py
+│   ├── data_pipeline.py
+│   ├── metrics.py
+│   └── Cleaned_GPS_Spoofing_Dataset.csv
+│
+├── AGIMS_App
+│   ├── backend
+│   │   ├── main.py
+│   │   ├── inference.py
+│   │   ├── attack_simulator.py
+│   │   ├── data_simulator.py
+│   │   ├── model_loader.py
+│   │   ├── websocket_manager.py
+│   │   ├── schemas.py
+│   │   └── utils.py
+│   │
+│   └── frontend
+│       ├── index.html
+│       ├── style.css
+│       └── app.js
+│
+├── Models
+│   └── ML training notebooks
+│
+├── ResearchPapers
+│   └── Reference papers
+│
+└── README.md
+
+```
+
+# Installation
+
+Clone Repository
+git clone https://github.com/AnmolShrma1/Major_Project_Group_45.git
+cd Major_Project_Group_45
+
+# Install Dependencies
+
+pip install fastapi
+pip install uvicorn
+pip install pandas
+pip install numpy
+pip install torch
+pip install scikit-learn
+pip install websockets
+
+
+# Training the Detection Model
+
+cd AGIMS
+python train.py
+
+This trains the LSTM-based GNSS spoofing detection model.
+
+# Running the Real-Time Monitoring Dashboard
+
+Navigate to the backend folder:
+
+cd AGIMS_App/backend
+
+Run the FastAPI server:
+
+uvicorn main:app --reload
+
+Open the dashboard in your browser:
+
+http://localhost:8000
+
+# Authors
+
+Anmol Sharma
+Akanksha Sharma
+Rashi Sharma
+Simran Suri
 
 Department of Computer Science & Engineering
-Jaypee University of Information Technology, Waknaghat
-December 2025
+Jaypee University of Information Technology
 
-1. Overview
+# Supervisor
 
-This repository contains the implementation and analysis of a machine-learning-based framework designed to detect GPS/GNSS spoofing attacks in mission-critical military IoT systems.
-The objective is to develop a lightweight, real-time, and high-accuracy detection pipeline that can operate reliably on resource-constrained defense IoT devices.
-
-GPS spoofing is a critical cyber-physical threat capable of disrupting navigation, timing, and mission operations. This project integrates Machine Learning, signal analysis, and cybersecurity to deliver an effective detection system.
-
-2. Key Features
-
-Real-time detection of GPS spoofing attacks
-
-Multi-model ML pipeline (LightGBM, XGBoost, Random Forest, LinearSVC)
-
-Exploratory Data Analysis (EDA) and feature-importance ranking
-
-PRN-level spoofing behavior and anomaly visualization
-
-Real-time alert generation
-
-Secure log processing & pattern analysis
-
-Designed for deployment on military IoT systems
-
-3. System Architecture
-3.1 Data Acquisition
-
-GNSS receiver logs collected under normal, jammed, and spoofed conditions
-
-Includes multiple constellations: GPS, Galileo, GLONASS, BeiDou, QZSS
-
-Extracted core GNSS signal features such as CN₀, Doppler, PRN, PD, CP, TCD
-
-3.2 Preprocessing
-
-Cleaning and normalization
-
-Outlier removal
-
-Redundant features removed (EC, LC, PQP)
-
-3.3 Machine Learning Models
-
-LightGBM – highest accuracy and fastest inference
-
-XGBoost – strong generalization
-
-Random Forest – interpretable and stable baseline
-
-Linear SVC – linear benchmark model
-
-3.4 Real-Time Detection Layer
-
-Streams GNSS logs
-
-Performs live inference on each signal batch
-
-Generates spoofing alerts with severity levels
-
-3.5 Cybersecurity Layer
-
-Secure logging
-
-Intrusion monitoring
-
-PRN-wise spoofing analysis
-
-4. Dataset Summary
-
-The dataset used includes GNSS observations captured at Yunnan University with:
-
-Normal operation
-
-Commercial jamming
-
-SDR-based spoofing using HackRF One
-
-Final selected features:
-PRN, DO, PD, RX, TOW, CP, PC, PIP, TCD, CN0
-
-5. Model Performance
-Model	Accuracy	Key Strengths
-LightGBM	97.72%	Fastest & most accurate, ideal for real-time detection
-XGBoost	93.64%	Robust with non-linear feature handling
-Random Forest	90.57%	Strong baseline, interpretable
-Linear SVC	72.23%	Weak for complex/non-linear spoofing patterns
-6. Repository Structure
-├── data/                    # Raw + processed datasets
-├── notebooks/               # EDA, training, evaluation notebooks
-├── models/                  # Saved ML models
-├── scripts/
-│   ├── preprocess.py        # Data cleaning + feature processing
-│   ├── train_models.py      # Model training pipeline
-│   ├── realtime_detect.py   # Real-time spoofing detection
-│   └── log_analyzer.py      # Spoofing log analysis
-├── results/                 # Plots and visual outputs
-├── README.md
-└── requirements.txt
-
-7. Usage Instructions
-Step 1 — Install Dependencies
-pip install -r requirements.txt
-
-Step 2 — Preprocess Data
-python scripts/preprocess.py
-
-Step 3 — Train the Models
-python scripts/train_models.py
-
-Step 4 — Run Real-Time Detection
-python scripts/realtime_detect.py
-
-Step 5 — Analyze Logs
-python scripts/log_analyzer.py
-
-8. Real-Time Alert Example
-[SPOOFING ALERT]
-Satellite PRN: 2
-Severity: HIGH
-Timestamp: 2025-11-20 19:32:04
-
-9. Limitations
-
-Dataset is imbalanced (normal >> spoofed)
-
-Some models struggle with unseen PRNs
-
-No physical GNSS receiver testing conducted
-
-Environmental noise & multipath not fully simulated
-
-10. Future Scope
-
-Integration with real GNSS receivers (hardware-in-loop)
-
-Deep learning architectures (CNN, LSTM, Transformers)
-
-Multi-sensor fusion with IMU and map data
-
-Cloud-based GPS threat monitoring platform
-
-Adaptive thresholding for dynamic spoofing environments
-
-11. Authors
-
-Rashi Sharma (221030262)
-
-Anmol Sharma (221030285)
-
-Akanksha Sharma (221031017)
-
-Simran Suri (221030243)
-
-Supervisor:
 Prof. Dr. Pradeep Kumar Gupta
+
+Keywords
+GPS Spoofing • GNSS Security • Machine Learning • LSTM • Cyber-Physical Systems • IoT Security • Satellite Navigation • Signal Integrity Monitoring
