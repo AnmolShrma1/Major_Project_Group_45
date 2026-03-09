@@ -5,12 +5,14 @@ import torch
 from sklearn.preprocessing import StandardScaler
 from torch.utils.data import Dataset
 
-WINDOW = 30
+WINDOW = 30 #Because spoofing attacks evolve over time, not in one instant
 
 RAW_FEATURES = ["DO","PD","RX","TOW","CP","EC","LC","PC","PIP","PQP","TCD","CN0"]
-DELTA_FEATURES = ["dDO","dPD","dCN0","dTCD","dEC","dLC","dPC"]
+DELTA_FEATURES = ["dDO","dPD","dCN0","dTCD","dEC","dLC","dPC"] 
+#dDO = DO(t) - DO(t-1), Spoofing causes abrupt signal changes model learns to detect signal jumps
 
 RISK_MAP = {0:0.1, 1:0.4, 2:0.7, 3:0.9}
+#Instead of predicting class labels, the model predicts risk score
 
 class GNSSDataset(Dataset):
     def __init__(self, csv_path, scaler=None, random_seed=42, attack_prob=0.3, 
@@ -25,32 +27,35 @@ class GNSSDataset(Dataset):
             risk_mode: 'absolute' (predict final risk) or 'delta' (predict risk change)
             train_prns: List of PRN indices to use for fitting scaler (prevents leakage)
         """
-        np.random.seed(random_seed)
+        np.random.seed(random_seed) #Ensures that random attacks injected during training are reproducible
         
         df = pd.read_csv(csv_path)
         df = df.sort_values(["PRN","TOW","RX"]).reset_index(drop=True)
+        #Because we want signals ordered like:
+        #PRN1: t1, t2, t3, ...
+        #PRN2: t1, t2, t3, ...
 
-        df["risk"] = df["Output"].map(RISK_MAP)
+        df["risk"] = df["Output"].map(RISK_MAP) # map class labels to risk scores (0.1, 0.4, 0.7, 0.9) for regression target
 
         # Calculate delta features BEFORE attack injection
         for col in ["DO","PD","CN0","TCD","EC","LC","PC"]:
-            df[f"d{col}"] = df.groupby("PRN")[col].diff().fillna(0)
+            df[f"d{col}"] = df.groupby("PRN")[col].diff().fillna(0) #Signals are grouped by satellite,Calculates difference between consecutive rows, First row has no previous value
 
         self.features = RAW_FEATURES + DELTA_FEATURES
         self.risk_mode = risk_mode
 
         # Create streams first (before scaling)
-        self.streams = []
+        self.streams = [] #Each PRN becomes one stream
         
-        for stream_idx, (prn, g) in enumerate(df.groupby("PRN")):
+        for stream_idx, (prn, g) in enumerate(df.groupby("PRN")): #Each satellite signal becomes one independent sequence
             g = g.reset_index(drop=True)
 
             # Inject attacks with proper bounds checking
             if len(g) >= 50 and np.random.rand() < attack_prob:
-                start = np.random.randint(0, len(g) - 50)
-                self.inject_simplistic_attack(g, start, 40)
+                start = np.random.randint(0, len(g) - 50) #Randomly chooses attack start position
+                self.inject_simplistic_attack(g, start, 40) #Creates a synthetic spoofing attack lasting 40 timesteps
 
-            if len(g) > WINDOW:
+            if len(g) > WINDOW: #Only streams longer than 30 samples are used
                 self.streams.append(g)
 
         # Handle scaler - FIT ONLY ON TRAINING PRNS
