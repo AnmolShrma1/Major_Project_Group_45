@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AGIMS - GNSS Integrity Monitoring</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <h1>🛰️ AGIMS</h1>
+                <p class="subtitle">AI-based GNSS Integrity Monitoring System</p>
+            </div>
+            <div class="connection-status">
+                <span class="status-indicator" id="connectionStatus"></span>
+                <span id="connectionText">Connecting...</span>
+            </div>
+        </header>
+
+        <div class="main-content">
+            <!-- Left Panel - Controls -->
+            <aside class="control-panel">
+                <div class="panel-section">
+                    <h3>Simulation Control</h3>
+                    <button id="startBtn" class="btn btn-primary">▶ Start Simulation</button>
+                    <button id="stopBtn" class="btn btn-danger" disabled>⏹ Stop Simulation</button>
+                    <button id="demoBtn" class="btn btn-demo">🎬 Demo Mode</button>
+                </div>
+
+                <div class="panel-section">
+                    <h3>PRN Selection</h3>
+                    <div id="prnSelector" class="prn-grid"></div>
+                </div>
+
+                <div class="panel-section">
+                    <h3>Attack Configuration</h3>
+                    <label for="attackType">Attack Type:</label>
+                    <select id="attackType" class="input-select">
+                        <option value="none">No Attack</option>
+                        <option value="simplistic">Simplistic Attack</option>
+                        <option value="intermediate">Intermediate Attack</option>
+                        <option value="sophisticated">Sophisticated Attack</option>
+                    </select>
+
+                    <label for="attackIntensity">Intensity: <span id="intensityValue">1.0</span></label>
+                    <input type="range" id="attackIntensity" min="0.1" max="2.0" step="0.1" value="1.0" class="slider">
+
+                    <button id="attackStartBtn" class="btn btn-warning" disabled>⚠️ Start Attack</button>
+                    <button id="attackStopBtn" class="btn btn-secondary" disabled>✓ Stop Attack</button>
+                </div>
+
+                <div class="panel-section">
+                    <h3>System Status</h3>
+                    <div class="status-item">
+                        <span class="status-label">Simulation:</span>
+                        <span id="simStatus" class="status-value">Stopped</span>
+                    </div>
+                    <div class="status-item">
+                        <span class="status-label">Model:</span>
+                        <span id="modelStatus" class="status-value">Loading...</span>
+                    </div>
+                    <div class="status-item">
+                        <span class="status-label">Active Attack:</span>
+                        <span id="attackStatus" class="status-value">None</span>
+                    </div>
+                    <div class="status-item">
+                        <span class="status-label">Detections:</span>
+                        <span id="detectionCount" class="status-value">0</span>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- Main Panel - Visualizations -->
+            <main class="visualization-panel">
+                <!-- Risk Score Overview -->
+                <div class="chart-container">
+                    <h3>Risk Score Timeline</h3>
+                    <canvas id="riskChart"></canvas>
+                </div>
+
+                <!-- PRN Grid -->
+                <div class="prn-monitor-grid">
+                    <h3>PRN Status Monitor</h3>
+                    <div id="prnMonitors" class="prn-monitors"></div>
+                </div>
+
+                <!-- Feature Charts -->
+                <div class="feature-charts">
+                    <div class="chart-container">
+                        <h3>CN0 (Carrier-to-Noise Ratio)</h3>
+                        <canvas id="cn0Chart"></canvas>
+                    </div>
+                    <div class="chart-container">
+                        <h3>Doppler Shift (DO)</h3>
+                        <canvas id="doChart"></canvas>
+                    </div>
+                    <div class="chart-container">
+                        <h3>Time Carrier Deviation (TCD)</h3>
+                        <canvas id="tcdChart"></canvas>
+                    </div>
+                </div>
+            </main>
+
+            <!-- Right Panel - Live Feed -->
+            <aside class="live-feed-panel">
+                <h3>Live Detection Feed</h3>
+                <div id="liveFeed" class="live-feed"></div>
+            </aside>
+        </div>
+    </div>
+
+    <!-- Alert Modal -->
+    <div id="alertModal" class="modal">
+        <div class="modal-content alert-modal">
+            <span class="alert-icon">⚠️</span>
+            <h2>ATTACK DETECTED</h2>
+            <p id="alertMessage"></p>
+            <button class="btn btn-primary" onclick="closeAlert()">Acknowledge</button>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
