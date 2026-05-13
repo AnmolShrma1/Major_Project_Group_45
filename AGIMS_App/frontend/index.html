@@ -3,126 +3,160 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AGIMS - GNSS Integrity Monitoring</title>
+    <title>AGIMS – GNSS Integrity Monitoring</title>
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Exo+2:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 </head>
 <body>
-    <div class="container">
-        <!-- Header -->
-        <header class="header">
-            <div class="header-content">
-                <h1>🛰️ AGIMS</h1>
+    <div class="scanline"></div>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="header-left">
+            <span class="logo-icon">🛰️</span>
+            <div>
+                <h1>AGIMS</h1>
                 <p class="subtitle">AI-based GNSS Integrity Monitoring System</p>
             </div>
-            <div class="connection-status">
-                <span class="status-indicator" id="connectionStatus"></span>
-                <span id="connectionText">Connecting...</span>
+        </div>
+        <div class="header-center">
+            <div class="ds-badge" id="dataSourceBadge">
+                <span class="ds-dot"></span>
+                <span id="dataSourceText">CONNECTING…</span>
             </div>
-        </header>
+        </div>
+        <div class="header-right">
+            <div class="ws-pill">
+                <span class="ws-dot" id="wsDot"></span>
+                <span id="wsText" class="mono">OFFLINE</span>
+            </div>
+            <div class="clock mono" id="clock">00:00:00</div>
+        </div>
+    </header>
 
-        <div class="main-content">
-            <!-- Left Panel - Controls -->
-            <aside class="control-panel">
-                <div class="panel-section">
-                    <h3>Simulation Control</h3>
-                    <button id="startBtn" class="btn btn-primary">▶ Start Simulation</button>
-                    <button id="stopBtn" class="btn btn-danger" disabled>⏹ Stop Simulation</button>
-                    <button id="demoBtn" class="btn btn-demo">🎬 Demo Mode</button>
+    <div class="app-body">
+
+        <!-- ── Left sidebar ────────────────────────────────── -->
+        <aside class="sidebar">
+
+            <div class="card">
+                <div class="card-title">SIMULATION</div>
+                <div class="btn-row">
+                    <button id="startBtn" class="btn btn-start">▶ START</button>
+                    <button id="stopBtn"  class="btn btn-stop" disabled>■ STOP</button>
                 </div>
+                <button id="demoBtn" class="btn btn-demo">◈ DEMO MODE</button>
+            </div>
 
-                <div class="panel-section">
-                    <h3>PRN Selection</h3>
-                    <div id="prnSelector" class="prn-grid"></div>
+            <div class="card">
+                <div class="card-title">PRN SELECTION</div>
+                <div id="prnSelector" class="prn-grid"></div>
+                <div class="btn-row mt-xs">
+                    <button class="btn btn-ghost btn-sm" id="selAllBtn">All</button>
+                    <button class="btn btn-ghost btn-sm" id="selNoneBtn">None</button>
                 </div>
+            </div>
 
-                <div class="panel-section">
-                    <h3>Attack Configuration</h3>
-                    <label for="attackType">Attack Type:</label>
-                    <select id="attackType" class="input-select">
-                        <option value="none">No Attack</option>
-                        <option value="simplistic">Simplistic Attack</option>
-                        <option value="intermediate">Intermediate Attack</option>
-                        <option value="sophisticated">Sophisticated Attack</option>
-                    </select>
-
-                    <label for="attackIntensity">Intensity: <span id="intensityValue">1.0</span></label>
-                    <input type="range" id="attackIntensity" min="0.1" max="2.0" step="0.1" value="1.0" class="slider">
-
-                    <button id="attackStartBtn" class="btn btn-warning" disabled>⚠️ Start Attack</button>
-                    <button id="attackStopBtn" class="btn btn-secondary" disabled>✓ Stop Attack</button>
+            <div class="card">
+                <div class="card-title">ATTACK INJECTION</div>
+                <label class="lbl">Type</label>
+                <select id="attackType" class="sel">
+                    <option value="none">— None —</option>
+                    <option value="simplistic">Simplistic</option>
+                    <option value="intermediate">Intermediate</option>
+                    <option value="sophisticated">Sophisticated</option>
+                </select>
+                <label class="lbl">Intensity <span id="intensityVal" class="accent">1.0</span></label>
+                <input type="range" id="attackIntensity" min="0.1" max="2.0" step="0.1" value="1.0" class="slider">
+                <div class="btn-row mt-xs">
+                    <button id="attackStartBtn" class="btn btn-warn" disabled>⚡ INJECT</button>
+                    <button id="attackStopBtn"  class="btn btn-ghost" disabled>✓ CLEAR</button>
                 </div>
+            </div>
 
-                <div class="panel-section">
-                    <h3>System Status</h3>
-                    <div class="status-item">
-                        <span class="status-label">Simulation:</span>
-                        <span id="simStatus" class="status-value">Stopped</span>
-                    </div>
-                    <div class="status-item">
-                        <span class="status-label">Model:</span>
-                        <span id="modelStatus" class="status-value">Loading...</span>
-                    </div>
-                    <div class="status-item">
-                        <span class="status-label">Active Attack:</span>
-                        <span id="attackStatus" class="status-value">None</span>
-                    </div>
-                    <div class="status-item">
-                        <span class="status-label">Detections:</span>
-                        <span id="detectionCount" class="status-value">0</span>
-                    </div>
+            <div class="card">
+                <div class="card-title">SYSTEM STATUS</div>
+                <div class="status-grid">
+                    <div class="srow"><span>Simulation</span> <span id="simStatus"    class="tag tag-off">STOPPED</span></div>
+                    <div class="srow"><span>Model</span>      <span id="modelStatus"  class="tag">—</span></div>
+                    <div class="srow"><span>Attack</span>     <span id="attackStatus" class="tag">NONE</span></div>
+                    <div class="srow"><span>Source</span>     <span id="sourceMode"   class="mono dim">—</span></div>
+                    <div class="srow"><span>PRNs</span>       <span id="prnCount"     class="mono dim">—</span></div>
+                    <div class="srow"><span>Detections</span><span id="detCount"     class="mono accent">0</span></div>
                 </div>
-            </aside>
+            </div>
 
-            <!-- Main Panel - Visualizations -->
-            <main class="visualization-panel">
-                <!-- Risk Score Overview -->
-                <div class="chart-container">
-                    <h3>Risk Score Timeline</h3>
-                    <canvas id="riskChart"></canvas>
+        </aside>
+
+        <!-- ── Main panel ──────────────────────────────────── -->
+        <main class="main-panel">
+
+            <!-- Threat banner -->
+            <div id="threatBanner" class="threat-banner hidden">
+                <span class="tb-icon">⚠</span>
+                <div class="tb-info">
+                    <div class="tb-level" id="bannerLevel">—</div>
+                    <div class="tb-decision" id="bannerDecision">—</div>
                 </div>
+                <div class="tb-action" id="bannerAction">—</div>
+                <button class="btn-close" onclick="closeBanner()">✕</button>
+            </div>
 
-                <!-- PRN Grid -->
-                <div class="prn-monitor-grid">
-                    <h3>PRN Status Monitor</h3>
-                    <div id="prnMonitors" class="prn-monitors"></div>
+            <!-- Risk timeline -->
+            <div class="card">
+                <div class="card-title">
+                    RISK SCORE TIMELINE
+                    <span class="chart-hint">showing first 6 PRNs — click legend to toggle</span>
                 </div>
+                <canvas id="riskChart" height="90"></canvas>
+            </div>
 
-                <!-- Feature Charts -->
-                <div class="feature-charts">
-                    <div class="chart-container">
-                        <h3>CN0 (Carrier-to-Noise Ratio)</h3>
-                        <canvas id="cn0Chart"></canvas>
-                    </div>
-                    <div class="chart-container">
-                        <h3>Doppler Shift (DO)</h3>
-                        <canvas id="doChart"></canvas>
-                    </div>
-                    <div class="chart-container">
-                        <h3>Time Carrier Deviation (TCD)</h3>
-                        <canvas id="tcdChart"></canvas>
-                    </div>
+            <!-- PRN monitor grid -->
+            <div class="card">
+                <div class="card-title">PRN STATUS MONITOR</div>
+                <div id="prnMonitors" class="prn-monitors"></div>
+            </div>
+
+            <!-- Feature charts row -->
+            <div class="chart-row">
+                <div class="card">
+                    <div class="card-title">CN0 – Carrier/Noise</div>
+                    <canvas id="cn0Chart" height="100"></canvas>
                 </div>
-            </main>
+                <div class="card">
+                    <div class="card-title">DO – Doppler</div>
+                    <canvas id="doChart" height="100"></canvas>
+                </div>
+                <div class="card">
+                    <div class="card-title">TCD – Time Carrier Dev.</div>
+                    <canvas id="tcdChart" height="100"></canvas>
+                </div>
+            </div>
 
-            <!-- Right Panel - Live Feed -->
-            <aside class="live-feed-panel">
-                <h3>Live Detection Feed</h3>
-                <div id="liveFeed" class="live-feed"></div>
-            </aside>
+        </main>
+
+        <!-- ── Right feed ───────────────────────────────────── -->
+        <aside class="feed-panel">
+            <div class="card-title">LIVE DETECTION FEED</div>
+            <div id="liveFeed" class="live-feed"></div>
+        </aside>
+
+    </div>
+
+    <!-- Alert overlay -->
+    <div id="alertOverlay" class="alert-overlay hidden">
+        <div class="alert-box">
+            <div class="alert-pulse"></div>
+            <div class="alert-hdr">⚠ SPOOFING DETECTED</div>
+            <div class="alert-lvl" id="alertLevel">—</div>
+            <div class="alert-msg" id="alertMsg">—</div>
+            <div class="alert-act" id="alertAction">—</div>
+            <button class="btn btn-start mt-sm" onclick="closeAlert()">ACKNOWLEDGE</button>
         </div>
     </div>
 
-    <!-- Alert Modal -->
-    <div id="alertModal" class="modal">
-        <div class="modal-content alert-modal">
-            <span class="alert-icon">⚠️</span>
-            <h2>ATTACK DETECTED</h2>
-            <p id="alertMessage"></p>
-            <button class="btn btn-primary" onclick="closeAlert()">Acknowledge</button>
-        </div>
-    </div>
-
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="app.js"></script>
 </body>
 </html>

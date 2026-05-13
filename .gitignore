@@ -205,3 +205,24 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+
+# =========================
+# AGIMS Project Specific
+# =========================
+
+# ML Models
+*.pth
+*.pt
+*.joblib
+*.h5
+
+# Videos / recordings
+*.mp4
+*.avi
+
+# Frontend dependencies
+node_modules/
+
+# Temporary folders
+temp/
+tmp/
